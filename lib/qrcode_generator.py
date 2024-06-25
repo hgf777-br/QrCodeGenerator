@@ -33,7 +33,7 @@ def find_biggest_version(codes: list, progress_var: tk.IntVar) -> int:
 
 def check_file_not_exist(file_name: str) -> bool:
     if os.path.exists(file_name):
-        if messagebox.askyesno("Arquivo já existe", "Deseja sobrescrever o arquivo?"):
+        if messagebox.askyesno("Arquivo já existe", "Deseja substituir o arquivo?"):
             return True
         else:
             return False
@@ -41,10 +41,16 @@ def check_file_not_exist(file_name: str) -> bool:
     return True
 
 
-def create_qrcode_pdf(codes: list, file_name: str, version: int, progress_var: tk.IntVar) -> str:
+def create_qrcode_pdf(
+    codes: list,
+    file_name: str,
+    version: int,
+    progress_var: tk.IntVar,
+    use_labels: bool,
+) -> str:
     file_path = os.path.dirname(file_name)
     file_name = os.path.basename(file_name)[:-4]
-    file_name = file_path + f'/{file_name}_v{version}.pdf'
+    file_name = file_path + f'/{file_name}_v{version}{'_legenda' if use_labels else ''}.pdf'
     if check_file_not_exist(file_name):
         codes_size = len(codes)
         size = 25 + 4 * version
@@ -60,8 +66,9 @@ def create_qrcode_pdf(codes: list, file_name: str, version: int, progress_var: t
             buff.seek(0)
             drawing = svg2rlg(buff)
             drawing.drawOn(relatorio, 0, 0)
-            relatorio.setFontSize(1)
-            relatorio.drawString(1, 1, code[:-1].strip())
+            if use_labels:
+                relatorio.setFontSize(1)
+                relatorio.drawString(1, 1, code[:-1].strip())
             relatorio.showPage()
         relatorio.save()
 

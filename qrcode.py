@@ -74,6 +74,12 @@ class GerarQRCode:
             command=self.initialize_qrcode_generator,
             bootstyle=(SUCCESS, OUTLINE),
         )
+        self.use_labels = tk.BooleanVar()
+        self.button_use_labels = ttk.Checkbutton(
+            master=self.frame,
+            text="aplicar legenda",
+            variable=self.use_labels,
+        )
         self.label_status = ttk.Label(
             master=self.frame,
             text="Aguardando arquivo para processar",
@@ -103,10 +109,9 @@ class GerarQRCode:
         self.button_explore.grid(column=1, row=2, padx=(10, 0), sticky=tk.W)
         self.entry_file_explorer.grid(column=2, row=2, padx=(0, 10), sticky=tk.EW)
         self.button_generate_qrcode.grid(column=1, row=4, padx=(10, 0), pady=(20, 0), sticky=tk.EW)
+        self.button_use_labels.grid(column=2, row=4, padx=(10, 0), pady=(20, 0), sticky=tk.EW)
         self.label_status.grid(column=1, row=5, sticky=tk.W, columnspan=2)
-        self.status_progressbar.grid(
-            column=1, row=6, padx=10, sticky=tk.EW, columnspan=2
-        )
+        self.status_progressbar.grid(column=1, row=6, padx=10, sticky=tk.EW, columnspan=2)
 
     def check_file(self, filename: str) -> bool:
         """
@@ -202,7 +207,13 @@ class GerarQRCode:
         # Update the status label to 'Gerando os QRCodes'
         self.label_status.config(text='Gerando os QRCodes')
         # Generate a PDF file containing all the QR codes
-        file_name = create_qrcode_pdf(codes, file_name, version, self.progress_value)
+        file_name = create_qrcode_pdf(
+            codes,
+            file_name,
+            version,
+            self.progress_value,
+            self.use_labels.get(),
+        )
         if file_name is not None:
             # Update the status label to 'Códigos gerados com sucesso!'
             self.label_status.config(bootstyle=(SUCCESS))
